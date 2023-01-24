@@ -25,7 +25,7 @@ $app = new Laravel\Lumen\Application(
 
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 
-// $app->withFacades();
+$app->withFacades();
 
 $app->withEloquent();
 
@@ -39,6 +39,14 @@ $app->withEloquent();
 | your own bindings here if you like or you can make another file.
 |
 */
+
+$app->singleton(Illuminate\Session\SessionManager::class, function () use ($app) {
+    return $app->loadComponent('session', Illuminate\Session\SessionServiceProvider::class, 'session');
+});
+
+$app->singleton('session.store', function () use ($app) {
+    return $app->loadComponent('session', Illuminate\Session\SessionServiceProvider::class, 'session.store');
+});
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -78,9 +86,18 @@ $app->configure('app');
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
+$app->middleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+]);
+
+
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
+
+$app->routeMiddleware([
+    'withAuth' => App\Http\Middleware\WithAuth::class,
+]);
 
 /*
 |--------------------------------------------------------------------------

@@ -1,7 +1,6 @@
 <?php
 
 /** @var \Laravel\Lumen\Routing\Router $router */
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -15,4 +14,12 @@
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
+});
+
+$router->group(["prefix"=>"v1/api"], function () use ($router){
+    $router->post("login", "AuthController@login");
+    $router->get("testtoken", [
+        "middleware" => "withAuth",
+        "uses" => "AuthController@test"
+    ]);
 });
